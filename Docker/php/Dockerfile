@@ -22,7 +22,7 @@ RUN docker-php-ext-install mysqli pdo && docker-php-ext-enable pdo_mysql
 RUN docker-php-ext-install mbstring
 RUN docker-php-ext-install soap
 
-# Install Composer.
+# Установка композера
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && ln -s $(composer config --global home) /root/composer
 ENV PATH=$PATH:/root/composer/vendor/bin COMPOSER_ALLOW_SUPERUSER=1
