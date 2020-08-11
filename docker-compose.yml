@@ -1,0 +1,57 @@
+version: "3.6"
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - 85:80
+    environment:
+      VIRTUAL_HOST: my-project.local #Add to /etc/hosts as "127.0.0.1 my-project.local"
+    working_dir: /var/www/gc
+    volumes:
+      - .:/var/www/gc
+      - ./docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - php
+
+  php:
+    build:
+      context: Docker
+      dockerfile: ./docker/php/Dockerfile
+    container_name: php
+    environment:
+      UID: ${UID}
+      EXTERNAL_XDEBUG_PORT: ${EXTERNAL_XDEBUG_PORT}
+      DOCKER_HOST_IP: ${DOCKER_HOST_IP}
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG}
+    volumes:
+      - .:/var/www/gc
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+      - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/ext-xdebug.ini
+    working_dir: /var/www/gc
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:10.2
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_DATABASE:
+      MYSQL_USER: root
+      MYSQL_PASSWORD:
+    logging:
+      driver: syslog
+    ports:
+      - 3310:3306
+    restart: on-failure
+    volumes:
+      - ./docker/maria/var/database:/var/lib/mysql
+
+  redis:
+    image: redis:4.0-alpine
+    container_name: redis
+    volumes:
+      - ./docker/redis/var/data:/data
+    ports:
+      - 6380:6379
