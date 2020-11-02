@@ -16,8 +16,8 @@ services:
 
   php:
     build:
-      context: Docker
-      dockerfile: ./docker/php/Dockerfile
+      context: docker
+      dockerfile: php/Dockerfile
     container_name: php
     environment:
       UID: ${UID}
